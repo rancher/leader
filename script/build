@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+mkdir -p bin
+godep go build -o bin/leader main.go

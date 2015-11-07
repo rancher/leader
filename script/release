@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+./script/clean
+./script/build
+
+mkdir -p dist/artifacts/
+cp bin/* dist/artifacts
