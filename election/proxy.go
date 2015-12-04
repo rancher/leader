@@ -26,11 +26,6 @@ func New(client *metadata.Client, port int, command []string) *Watcher {
 }
 
 func (w *Watcher) getLeader() (metadata.Container, bool, error) {
-	selfStack, err := w.client.GetSelfStack()
-	if err != nil {
-		return metadata.Container{}, false, err
-	}
-
 	selfContainer, err := w.client.GetSelfContainer()
 	if err != nil {
 		return metadata.Container{}, false, err
@@ -39,16 +34,15 @@ func (w *Watcher) getLeader() (metadata.Container, bool, error) {
 	index := selfContainer.CreateIndex
 	leader := selfContainer
 
-	containers, err := w.client.GetContainers()
+	containers, err := w.client.GetServiceContainers(
+		selfContainer.ServiceName,
+		selfContainer.StackName,
+	)
 	if err != nil {
 		return metadata.Container{}, false, err
 	}
 
 	for _, container := range containers {
-		if container.CreateIndex < 1 || selfStack.Name != container.StackName {
-			continue
-		}
-
 		if container.CreateIndex < index {
 			index = container.CreateIndex
 			leader = container

@@ -15,6 +15,16 @@ func NewClient(url string) *Client {
 	return &Client{url}
 }
 
+func NewClientAndWait(url string) (*Client, error) {
+	client := &Client{url}
+
+	if err := testConnection(client); err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
 func (m *Client) SendRequest(path string) ([]byte, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", m.url+path, nil)
@@ -105,6 +115,22 @@ func (m *Client) GetContainers() ([]Container, error) {
 		return containers, err
 	}
 	return containers, nil
+}
+
+func (m *Client) GetServiceContainers(serviceName string, stackName string) ([]Container, error) {
+	var serviceContainers = []Container{}
+	containers, err := m.GetContainers()
+	if err != nil {
+		return serviceContainers, err
+	}
+
+	for _, container := range containers {
+		if container.StackName == stackName && container.ServiceName == serviceName {
+			serviceContainers = append(serviceContainers, container)
+		}
+	}
+
+	return serviceContainers, nil
 }
 
 func (m *Client) GetHosts() ([]Host, error) {
