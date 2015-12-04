@@ -37,7 +37,11 @@ func main() {
 }
 
 func appAction(cli *cli.Context) {
-	client := metadata.NewClient(metadataUrl)
+	client, err := metadata.NewClientAndWait(metadataUrl)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
 	w := election.New(client, cli.Int(port), cli.Args())
 
 	if cli.Bool(check) {
