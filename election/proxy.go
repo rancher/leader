@@ -25,6 +25,10 @@ func New(client *metadata.Client, port int, command []string) *Watcher {
 	}
 }
 
+func (w *Watcher) GetSelfServiceLeader() (metadata.Container, bool, error) {
+	return w.getLeader()
+}
+
 func (w *Watcher) getLeader() (metadata.Container, bool, error) {
 	selfContainer, err := w.client.GetSelfContainer()
 	if err != nil {
